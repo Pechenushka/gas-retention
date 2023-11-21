@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+    Симулятор утримання газу
+  </title>
+  <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet"/>
+  <style type="text/css">
+   body>.container {
+            width: 1140px;
+        }
+        #sim-container {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            width: 1110px;
+        }
+
+        input[type="number"] {
+            width: 70px !important;
+        }
+        input[type="number"][name="inclination"],
+        input[type="number"][name="noise"],
+        input[type="number"][name="planetMass"] {
+            width: 84px !important;
+        }
+  .gas-table {
+      border: 1px solid #dee2e6;
+      margin-top: 1em;
+  }
+  .gas-table .table-active {
+      font-weight: bold;
+  }
+  .gas-table tr td {
+      padding: 0.5em;
+  }
+  .gas-table tr {
+      cursor: pointer;
+  }
+  .gas-table tr:hover {
+      border: 1px solid black;
+  }
+
+  .gas-graph canvas {
+      border: 1px solid #bbb;
+  }
+
+  .cursor {
+      cursor: pointer;
+  }
+
+  #ChamberPixiView>canvas {
+      width: 550px;
+      height: 440px;
+  }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <div id="sim-container">
+   </div>
+  </div>
+  <div aria-hidden="true" aria-labelledby="helpModalLabel" class="modal" id="helpModal" role="dialog" tabindex="-1">
+   <div class="modal-dialog" role="document">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h5 class="modal-title" id="helpModalLabel">
+        Довідка
+      </h5>
+      <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+       <span aria-hidden="true">
+        ×
+       </span>
+      </button>
+     </div>
+     <div class="modal-body">
+      <p>
+        Цей симулятор демонструє, як гази
+        різної молекулярні маси поводяться, коли
+        утримуються в термодинамічній рівновазі у закритій 
+        камері. Камера може бути налаштована на дозвіл
+        частинкам, які перевищують певну швидкість покидати камеру,
+        аналогічног до покидання газами атмосфери планети
+      </p>
+      <p>
+        Для початку виберіть газ з випадаючого списку
+        меню в панелі
+       <strong>
+        Гази
+       </strong>
+       Ви можете додати до трьох газів за один раз
+       час. Натисніть на кнопку 
+       <strong>
+        початок
+        симуляції
+       </strong>
+       в панелі
+       <strong>
+        Властивості камери
+       </strong>
+       щоб побачити частинки в русі. Коли
+       симуляція запускається повзунки та більшість
+       інших параметрів вимкнено, тому вам будете
+       потрібно зупинити симуляцію, щоб зробити
+       зміни налаштувань.
+      </p>
+      <p>
+        Зауважте, що в цьому моделюванні частинки
+        в камері не відображають реальної кількості молекул — кожна показана частинка
+        являє собою набагато більше частинок реального газу.
+      </p>
+      <p>
+        Гістограма в лівій частині панелі
+       <strong>
+        Гази
+       </strong>
+       вказує на
+       абсолютну кількість кожного газу в
+       камері. Наведено відносні суми
+       у відсотках у списку газів. Ви можете редагувати іх співвідношення за допомогою бігунців.
+       Натисніть кнопку
+       <strong>
+        скинути налаштування
+       </strong>
+       щоб відновити всі
+       гази в повній кількості.
+      </p>
+      <p>
+        Одне застереження: зміни фази ігноруються в
+        цій симуляції. Тобто ми припускаємо, що
+        частинки в камері залишаються в
+        газоподібному стані незалежно від
+        температури або тиску в камері.
+      </p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div aria-hidden="true" aria-labelledby="aboutModalLabel" class="modal" id="aboutModal" role="dialog" tabindex="-1">
+   <div class="modal-dialog" role="document">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h5 class="modal-title" id="aboutModalLabel">
+        Про проект
+      </h5>
+      <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+       <span aria-hidden="true">
+        ×
+       </span>
+      </button>
+     </div>
+     <div class="modal-body">
+      <p class="sim-version">
+       gas-retention-simulator 0.0.1 
+      </p>
+      <p class="sim-version">
+        Розроблений Метенько Станіславом (2023-11-21)
+      </p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script crossorigin="anonymous" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" src="https://code.jquery.com/jquery-3.5.1.slim.min.js">
+  </script>
+  <script crossorigin="anonymous" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js">
+  </script>
+  <script src="dist/bundle.js">
+  </script>
+ </body>
+</html>
